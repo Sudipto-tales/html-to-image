@@ -1,66 +1,142 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# HTML to PDF & Image Generation API (Laravel + Browsershot)
 
-## About Laravel
+This Laravel API allows you to convert raw HTML into a **PDF** and a **PNG image** using [Spatie Browsershot](https://github.com/spatie/browsershot), powered by headless Chrome.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 API Endpoint
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**URL:**  
+```
 
-## Learning Laravel
+POST /api/generate-file
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+````
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🔐 Authentication
 
-## Laravel Sponsors
+The API uses a simple API key system.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Header:
 
-### Premium Partners
+| Key        | Value               |
+|------------|---------------------|
+| X-API-KEY  | `your_api_key_here` |
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Set your key in the `.env` file:
 
-## Contributing
+```env
+API_ACCESS_KEY=your_secret_key
+````
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## 📝 Request Parameters
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+| Parameter     | Type     | Required | Description                                                                 |
+| ------------- | -------- | -------- | --------------------------------------------------------------------------- |
+| `html`        | `string` | ✅ Yes    | The raw HTML content to be converted.                                       |
+| `format`      | `string` | ❌ No     | Page format for PDF. Options: `A4`, `A3`, `Letter`, `Legal`. Default: `A4`. |
+| `orientation` | `string` | ❌ No     | PDF orientation: `portrait` or `landscape`. Default: `portrait`.            |
+| `margin`      | `int`    | ❌ No     | Margin in pixels. Default: `10`.                                            |
+| `width`       | `int`    | ❌ No     | Width for PNG image rendering. Default: `1200`.                             |
+| `height`      | `int`    | ❌ No     | Height for PNG image rendering. Default: `700`.                             |
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 📤 Example cURL Request
 
-## License
+```bash
+curl -X POST http://yourdomain.com/api/generate-file \
+     -H "Content-Type: application/json" \
+     -H "X-API-KEY: your_api_key_here" \
+     -d '{
+           "html": "<h1>Hello PDF!</h1>",
+           "format": "A4",
+           "orientation": "portrait",
+           "margin": 10,
+           "width": 1200,
+           "height": 700
+         }'
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## ✅ Successful Response
+
+```json
+{
+  "message": "Files generated successfully",
+  "pdf_url": "https://yourdomain.com/storage/generated_<hash>.pdf",
+  "image_url": "https://yourdomain.com/storage/generated_<hash>.png"
+}
+```
+
+---
+
+## 📁 File Storage
+
+Files are saved in Laravel’s `storage/app/public` directory and are accessible via:
+
+```
+https://yourdomain.com/storage/{filename}
+```
+
+Ensure you have run:
+
+```bash
+php artisan storage:link
+```
+
+---
+
+## 🔄 Duplicate Requests
+
+If the same HTML and options are passed again, the API reuses existing files (based on hash):
+
+```json
+{
+  "message": "Files already exist",
+  "pdf_url": "...",
+  "image_url": "..."
+}
+```
+
+---
+
+## ⚙️ Requirements
+
+* PHP 8.0+
+* Laravel 9+
+* [Node.js](https://nodejs.org/) & [Puppeteer](https://pptr.dev/) (Browsershot requirement)
+* Google Chrome or Chromium installed
+
+Install Browsershot dependencies:
+
+```bash
+composer require spatie/browsershot
+npm install puppeteer --save
+```
+
+---
+
+## 🛠 Troubleshooting
+
+* Make sure Chrome/Chromium is installed.
+* If Puppeteer can't find Chrome, you can specify its path:
+
+```php
+Browsershot::html($html)->setChromePath('/path/to/chrome');
+```
+
+* Ensure `storage/` folder is writable and `storage:link` is set up.
+
+---
+
+## 📄 License
+
+MIT © 2025
+
